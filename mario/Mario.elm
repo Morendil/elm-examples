@@ -55,7 +55,7 @@ usePowerJump keys mario =
    else mario.power || mario.vy == 0
     
 canJump mario =
-  mario.vy == 0 || (not mario.jumping && mario.power)
+  mario.vy == 0 || (not mario.jumping && mario.power && mario.vy > -2)
 
 gravity : Float -> Model -> Model
 gravity dt mario =
