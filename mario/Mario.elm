@@ -10,6 +10,8 @@ type Model =
     , y   : Float
     , vx  : Float
     , vy  : Float
+    , jumping : Bool
+    , power : Bool
     , dir : Direction
     }
 
@@ -23,6 +25,8 @@ mario =
     , y = 0 
     , vx = 0
     , vy = 0
+    , jumping = False
+    , power = True
     , dir = Right
     }
 
@@ -40,7 +44,18 @@ step (dt, keys) mario =
 
 jump : Keys -> Model -> Model
 jump keys mario =
-    if keys.y > 0 && mario.vy == 0 then { mario | vy <- 6.0 } else mario
+    { mario |
+      jumping <- keys.y > 0,
+      vy <- if keys.y > 0 && canJump mario then 6.0 else mario.vy,
+      power <- usePowerJump keys mario
+    }
+    
+usePowerJump keys mario =
+   if not (mario.vy == 0) && keys.y > 0 && not mario.jumping then False
+   else mario.power || mario.vy == 0
+    
+canJump mario =
+  mario.vy == 0 || (not mario.jumping && mario.power)
 
 gravity : Float -> Model -> Model
 gravity dt mario =
@@ -80,7 +95,6 @@ display (w',h') mario =
               Right -> "right"
 
       src  = "imgs/mario/"++ verb ++ "/" ++ dir ++ ".gif"
-      --src  = "http://i188.photobucket.com/albums/z137/DreamsInMotion/Video%20Game%20Pictures/Metroid/samus-1.gif" 
 
       marioImage = image 35 35 src
 
